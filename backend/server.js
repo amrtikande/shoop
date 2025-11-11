@@ -182,6 +182,62 @@ SELF_PING_URL=https://votre-api.herokuapp.com/api/ping
    - Interval: 5 minutes
    - ✅ Ping automatique gratuit à vie !
 
+2. CRON-JOB.ORG (Gratuit)
+   - Allez sur cron-job.org
+   - Créez un compte
+   - Ajoutez un cronjob
+   - URL: https://votre-api.com/api/ping
+   - Schedule: */10 * * * * (toutes les 10 min)
+
+3. EASYCRON (Gratuit)
+   - easycron.com
+   - Plan gratuit: 1 tâche
+   - Configurez pour ping toutes les 15 minutes
+
+4. GITHUB ACTIONS (Gratuit si vous avez GitHub)
+   Créez .github/workflows/keepalive.yml :
+
+name: Keep-Alive
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Toutes les 15 minutes
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API
+        run: curl https://votre-api.com/api/ping
+
+*/
+
+// ============================================
+// ALTERNATIVE: Utiliser un service de BDD qui ne dort pas
+// ============================================
+/*
+
+Si vous voulez éviter complètement le problème:
+
+1. MONGODB ATLAS M0 (Gratuit mais dort)
+   ❌ Se met en veille après 60 jours sans activité
+   ✅ 512 MB storage gratuit
+
+2. RAILWAY.APP + PostgreSQL (Recommandé)
+   ✅ Ne dort jamais
+   ✅ 500 MB storage gratuit
+   ✅ $5 de crédit gratuit par mois
+   
+3. SUPABASE (PostgreSQL gratuit)
+   ✅ Ne dort jamais
+   ✅ 500 MB storage gratuit
+   ✅ Inclut authentification et storage
+
+4. PLANETSCALE (MySQL gratuit)
+   ✅ Ne dort jamais
+   ✅ 5 GB storage gratuit
+   ✅ Très rapide
+
+Pour changer de MongoDB à PostgreSQL, utilisez Prisma:
+npm install @prisma/client prisma
 
 */
 
@@ -540,4 +596,32 @@ module.exports = function(req, res, next) {
     res.status(401).json({ message: 'Token invalide.' });
   }
 };
+*/
+
+// ============================================
+// RÉSUMÉ DES SOLUTIONS
+// ============================================
+/*
+
+✅ SOLUTION 1 (Recommandé): UptimeRobot
+   - Gratuit à vie
+   - Ping toutes les 5 minutes
+   - Setup en 2 minutes
+   - Aucun code à modifier
+
+✅ SOLUTION 2: Cron interne (déjà inclus dans ce code)
+   - Ping MongoDB toutes les 10 minutes
+   - Reconnexion automatique
+   - Pas de service externe nécessaire
+
+✅ SOLUTION 3: Changer de base de données
+   - Railway + PostgreSQL (ne dort jamais)
+   - Supabase (ne dort jamais)
+   - PlanetScale (ne dort jamais)
+
+🎯 MEILLEURE COMBINAISON:
+   - Backend avec cron interne (ce code)
+   - + UptimeRobot pour ping externe
+   - = MongoDB ne dormira JAMAIS ! 🚀
+
 */
