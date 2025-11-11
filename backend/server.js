@@ -14,7 +14,7 @@ const cron = require('node-cron');
 require('dotenv').config();
 
 const app = express();
-const orderRoutes = require('./routes/orders.js');
+const orderRoutes = require('./routes/orderRoutes');
 app.use('/api/orders', orderRoutes);
 
 // ----------------------
