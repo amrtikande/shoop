@@ -14,8 +14,8 @@ const cron = require('node-cron');
 require('dotenv').config();
 
 const app = express();
-const orderRoutes = require('./routes/orders');
-app.use('/api/orders', orderRoutes);
+const orders = require('./routes/orders');
+app.use('/api/orders', orders);
 
 // ----------------------
 // Middleware
@@ -138,6 +138,7 @@ process.on('SIGINT', async () => {
   console.log('🛑 Serveur arrêté proprement');
   process.exit(0);
 });
+
 
 
 
