@@ -2,6 +2,36 @@
 // BACKEND E-COMMERCE - Node.js + Express + MongoDB
 // Optimisé pour Render avec keep-alive
 // ============================================
+const express = require('express');
+const router = express.Router();
+const Order = require('../models/Order'); // ton modèle Order
+
+// Création d'une commande
+router.post('/', async (req, res) => {
+  try {
+    const { clientName, phone, address, products } = req.body;
+    if (!clientName || !phone || !address) {
+      return res.status(400).json({ message: 'Tous les champs clientName, phone et address sont requis.' });
+    }
+    const newOrder = new Order({ clientName, phone, address, products });
+    await newOrder.save();
+    res.status(201).json(newOrder);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Récupérer toutes les commandes
+router.get('/', async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+module.exports = router;
 
 require('dotenv').config();
 const express = require('express');
@@ -137,3 +167,4 @@ process.on('SIGINT', async () => {
   console.log('🛑 Serveur arrêté proprement');
   process.exit(0);
 });
+
