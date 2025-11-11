@@ -2,7 +2,11 @@
 // BACKEND E-COMMERCE - Node.js + Express + MongoDB
 // Optimisé pour Render avec keep-alive
 // ============================================
-
+console.log('🔍 Variables d\'environnement :');
+console.log('PORT:', process.env.PORT);
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? '✅ Défini' : '❌ Manquant');
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ Défini' : '❌ Manquant');
+console.log('ADMIN_PASSWORD:', process.env.ADMIN_PASSWORD ? '✅ Défini' : '❌ Manquant');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -132,3 +136,4 @@ process.on('SIGINT', async () => {
   console.log('🛑 Serveur arrêté proprement');
   process.exit(0);
 });
+
