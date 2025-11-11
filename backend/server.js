@@ -1,12 +1,14 @@
 // ============================================
 // BACKEND E-COMMERCE - Node.js + Express + MongoDB
-// Optimisé pour Render avec keep-alive
+// Optimisé pour Render avec Keep-Alive
 // ============================================
+
 console.log('🔍 Variables d\'environnement :');
 console.log('PORT:', process.env.PORT);
 console.log('MONGODB_URI:', process.env.MONGODB_URI ? '✅ Défini' : '❌ Manquant');
 console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ Défini' : '❌ Manquant');
 console.log('ADMIN_PASSWORD:', process.env.ADMIN_PASSWORD ? '✅ Défini' : '❌ Manquant');
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -14,8 +16,6 @@ const cron = require('node-cron');
 require('dotenv').config();
 
 const app = express();
-const orderRoutes = require('./routes/orders');
-app.use('/api/orders', orderRoutes);
 
 // ----------------------
 // Middleware
@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 // ----------------------
 app.use('/api/products', require('./routes/products'));
-app.use('/api/orders', require('./routes/orders'));
+app.use('/api/orders', require('./routes/orders')); // ✅ une seule fois
 app.use('/api/auth', require('./routes/auth'));
 
 // Health check
@@ -46,7 +46,12 @@ app.get('/api/ping', async (req, res) => {
     const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
     const Product = require('./models/Product');
     const count = await Product.countDocuments();
-    res.json({ status: 'ok', database: dbStatus, productsCount: count, timestamp: new Date().toISOString() });
+    res.json({ 
+      status: 'ok', 
+      database: dbStatus, 
+      productsCount: count, 
+      timestamp: new Date().toISOString() 
+    });
   } catch (err) {
     res.status(500).json({ status: 'error', message: err.message });
   }
@@ -64,8 +69,6 @@ if (!MONGODB_URI) {
 const connectDB = async () => {
   try {
     await mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
     });
@@ -78,7 +81,7 @@ const connectDB = async () => {
 
 // Gestion des déconnexions
 mongoose.connection.on('disconnected', () => {
-  console.log('⚠️  MongoDB déconnecté, tentative de reconnexion...');
+  console.log('⚠️ MongoDB déconnecté, tentative de reconnexion...');
   setTimeout(connectDB, 5000);
 });
 
@@ -92,8 +95,6 @@ connectDB();
 // ----------------------
 // Keep-alive automatique
 // ----------------------
-
-// Ping MongoDB toutes les 10 minutes
 cron.schedule('*/10 * * * *', async () => {
   try {
     if (mongoose.connection.readyState === 1) {
@@ -109,7 +110,7 @@ cron.schedule('*/10 * * * *', async () => {
   }
 });
 
-// Auto-ping du serveur si SELF_PING_URL défini
+// Auto-ping du serveur Render (si activé)
 if (process.env.SELF_PING_URL) {
   const https = require('https');
   cron.schedule('*/14 * * * *', () => {
@@ -122,7 +123,7 @@ if (process.env.SELF_PING_URL) {
 }
 
 // ----------------------
-// Démarrage serveur
+// Lancement du serveur
 // ----------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -131,16 +132,10 @@ app.listen(PORT, () => {
 });
 
 // ----------------------
-// Graceful shutdown
+// Arrêt propre du serveur
 // ----------------------
 process.on('SIGINT', async () => {
   await mongoose.connection.close();
   console.log('🛑 Serveur arrêté proprement');
   process.exit(0);
 });
-
-
-
-
-
-
